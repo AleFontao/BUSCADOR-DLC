@@ -1,7 +1,7 @@
 package entities;
 
 public class Documento {
-
+    //Existen 593 documentos en el archivo que nos pasaron
     private Integer id;
     private String nombreDocumento;
     private Integer valor;
@@ -10,6 +10,10 @@ public class Documento {
         this.id = id;
         this.nombreDocumento = nombreDocumento;
         this.valor = valor;
+    }
+
+    public Documento() {
+
     }
 
     public Integer getId() {

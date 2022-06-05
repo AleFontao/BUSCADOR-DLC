@@ -1,22 +1,28 @@
 package entities;
 
 public class Vocabulario {
-    private Integer id;
+    private String palabra;
     private Integer nr; //En cuantos documentos se encuentra
     private Integer tf; //Cantidad de apariciones
+    private Integer maxTf; //Cantidad maxima de apariciones en todos los doc
 
-    public Vocabulario(Integer id, Integer nr, Integer tf) {
-        this.id = id;
+    public Vocabulario(String palabra, Integer nr, Integer tf, Integer maxTf) {
+        this.palabra = palabra;
         this.nr = nr;
         this.tf = tf;
+        this.maxTf = maxTf;
     }
 
-    public Integer getId() {
-        return id;
+    public Vocabulario() {
+        this("", 0, 1, 1);
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public String getPalabra() {
+        return palabra;
+    }
+
+    public void setPalabra(String palabra) {
+        this.palabra = palabra;
     }
 
     public Integer getNr() {
@@ -34,4 +40,9 @@ public class Vocabulario {
     public void setTf(Integer tf) {
         this.tf = tf;
     }
+
+    public Integer getMaxTf() {return maxTf;}
+
+    public void setMaxTf(Integer maxTf) {this.maxTf = maxTf;}
+
 }

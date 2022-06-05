@@ -1,31 +1,46 @@
 package entities;
 
+import javax.print.Doc;
 import java.util.ArrayList;
 
 public class Posteo {
-    private ArrayList<Documento> listaDocumento;
-    private int tf;
+    private int idDocumento;
+    private int maxtf;
+    private String palabra;
+    
 
 
-    public Posteo(ArrayList<Documento> listaDocumento, int tf) {
-        this.listaDocumento = listaDocumento;
-
-        this.tf = tf;
+    public Posteo(int idDocumento, int maxtf, String palabra) {
+        this.idDocumento = idDocumento;
+        this.maxtf = maxtf;
+        this.palabra = palabra;
     }
 
-    public ArrayList<Documento> getListaDocumento() {
-        return listaDocumento;
+    public Posteo() {
+
     }
 
-    public void setListaDocumento(ArrayList<Documento> listaDocumento) {
-        this.listaDocumento = listaDocumento;
+    public int getIdDocumento() {
+        return idDocumento;
     }
 
-    public int getTf() {
-        return tf;
+    public void setIdDocumento(int idDocumento) {
+        this.idDocumento = idDocumento;
     }
 
-    public void setTf(int tf) {
-        this.tf = tf;
+    public String getPalabra() {
+        return palabra;
+    }
+
+    public void setPalabra(String palabra) {
+        this.palabra = palabra;
+    }
+
+    public int getMaxtf() {
+        return maxtf;
+    }
+
+    public void setMaxtf(int maxtf) {
+        this.maxtf = maxtf;
     }
 }
