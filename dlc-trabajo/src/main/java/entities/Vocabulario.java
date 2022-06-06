@@ -1,5 +1,8 @@
 package entities;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Vocabulario {
     private String palabra;
     private Integer nr; //En cuantos documentos se encuentra
@@ -7,10 +10,10 @@ public class Vocabulario {
     private Integer maxTf; //Cantidad maxima de apariciones en todos los doc
 
     public Vocabulario(String palabra, Integer nr, Integer tf, Integer maxTf) {
-        this.palabra = palabra;
-        this.nr = nr;
+        this.palabra = palabra; //palabra eje: quixote
+        this.nr = nr; //cantidad de archivos en los que aparece
+        this.maxTf = maxTf; //cantidad maxima de veces que aparece en todos los archivos
         this.tf = tf;
-        this.maxTf = maxTf;
     }
 
     public Vocabulario() {
@@ -44,5 +47,15 @@ public class Vocabulario {
     public Integer getMaxTf() {return maxTf;}
 
     public void setMaxTf(Integer maxTf) {this.maxTf = maxTf;}
+
+    public float calcularImportancia(Integer cantidadDocs, HashMap<String, Posteo> posteoPalabraBuscada){
+        float divisor = 0;
+        for (Map.Entry<String, Posteo> entry : posteoPalabraBuscada.entrySet()) {
+            divisor = (float) Math.pow ((float) entry.getValue().getTf() * Math.log10(cantidadDocs/posteoPalabraBuscada.size()),  2);
+        }
+        float importancia = (float) ((float)this.tf * Math.log10(cantidadDocs/this.nr)/(Math.sqrt(divisor)));
+
+        return importancia;
+    }
 
 }

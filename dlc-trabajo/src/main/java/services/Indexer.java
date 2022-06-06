@@ -21,7 +21,6 @@ public class Indexer {
 
     public static void main(String args[]) {
         Indexer indexer = new Indexer();
-
         indexer.leerArchivos();
     }
 
@@ -76,6 +75,7 @@ public class Indexer {
 
                 while (tokens.hasMoreTokens()) {
                     String palabra = tokens.nextToken().toUpperCase();
+
                     //Creo que esta todo en ingles por lo cual no hace falta las tildes
                     Pattern p = Pattern.compile("[^ÁÉÍÓÚA-Z]");
                     Matcher match = p.matcher(palabra);
@@ -91,7 +91,7 @@ public class Indexer {
                             continue;
                         }
                         Vocabulario vocabulario;
-
+                        Posteo posteo = new Posteo();
                         //Si no existe la palabra la agregamos
                         if (!hashVocabulario.containsKey(palabra)) {
                             vocabulario = new Vocabulario();
@@ -104,8 +104,16 @@ public class Indexer {
                             //Palabras que aparecen mas de una vez
                             vocabulario = hashVocabulario.get(palabra);
                             vocabulario.setTf(vocabulario.getTf() + 1);
-                            if(vocabulario.getTf() > vocabulario.getMaxTf()){//Esto esta mal, hay que pensar como setearlo
-                                vocabulario.setMaxTf(vocabulario.getTf());
+
+
+
+                            if(hashPosteo.get(palabra) != null){
+                                posteo = hashPosteo.get(palabra);
+                                posteo.setTf(hashPosteo.get(palabra).getTf() + 1);
+                                hashPosteo.put(palabra,posteo);
+                                if(vocabulario.getMaxTf() > hashPosteo.get(palabra).getTf()){
+                                    vocabulario.setMaxTf(vocabulario.getTf());
+                                }
                             }
 
                             hashVocabulario.put(palabra, vocabulario);
@@ -114,9 +122,9 @@ public class Indexer {
 
                             /*vocabulario = new Vocabulario();
                             vocabulario = hashVocabulario.get(palabra);*/
-                            indexarPosteo(documento, idDoc, palabra);
-                            //Aumentamos en 1 el nr de vocabulario
+                            indexarPosteo(documento, idDoc, palabra, hashVocabulario.get(palabra).getTf());
 
+                            //Aumentamos en 1 el nr de vocabulario
                             vocabulario = hashVocabulario.get(palabra);
                             vocabulario.setNr(vocabulario.getNr() + 1);
                             hashVocabulario.put(palabra, vocabulario);
@@ -140,13 +148,14 @@ public class Indexer {
 
     }
 
-    public void indexarPosteo(File documento, Integer idDoc, String palabra )
+    public void indexarPosteo(File documento, Integer idDoc, String palabra, Integer tf)
     {
         Documento doc = new Documento();
         doc.setNombreDocumento(documento.getName());
         Posteo posteo = new Posteo();
         posteo.setIdDocumento(idDoc);
         posteo.setPalabra(palabra);
+        posteo.setTf(tf);
         hashPosteo.put(palabra, posteo);
 
         return;

@@ -19,19 +19,18 @@ public class DAOposteo {
 
         try {
            
-            PreparedStatement ps = con.prepareStatement("INSERT INTO Buscador.Posteo (idDocumento, palabra) VALUES (?,?)");
+            PreparedStatement ps = con.prepareStatement("INSERT INTO Buscador.Posteo (idDocumento, palabra, tf) VALUES (?,?,?)");
 
             for (Map.Entry<String, Posteo> entry : posteo.entrySet()) {
                 String key = entry.getKey();
                 Posteo value = entry.getValue();
                 ps.setInt(1,value.getIdDocumento());
                 ps.setString(2,value.getPalabra());
+                ps.setInt(3,value.getTf());
                 ps.addBatch();
 
             }
 
-
-            System.out.println("lote");
             ps.executeBatch();
 
         } catch (SQLException e) {

@@ -5,21 +5,20 @@ import java.util.ArrayList;
 
 public class Posteo {
     private int idDocumento;
-    private int maxtf;
+    private int tf;
     private String palabra;
     
 
 
-    public Posteo(int idDocumento, int maxtf, String palabra) {
+    public Posteo(int idDocumento, int tf, String palabra) {
         this.idDocumento = idDocumento;
-        this.maxtf = maxtf;
+        this.tf = tf; //veces
         this.palabra = palabra;
     }
 
     public Posteo() {
 
     }
-
     public int getIdDocumento() {
         return idDocumento;
     }
@@ -36,11 +35,13 @@ public class Posteo {
         this.palabra = palabra;
     }
 
-    public int getMaxtf() {
-        return maxtf;
+    public void setTf(int tf) {
+        this.tf = tf;
     }
 
-    public void setMaxtf(int maxtf) {
-        this.maxtf = maxtf;
+    public int getTf() {
+        return tf;
     }
+
+
 }
