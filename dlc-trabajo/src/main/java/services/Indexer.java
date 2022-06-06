@@ -43,9 +43,7 @@ public class Indexer {
 
             indexar(documento, i);
             i++;
-
-
-
+            
 
         }
         long endTime = System.currentTimeMillis() - startTime;
@@ -108,7 +106,7 @@ public class Indexer {
                             if (!hashPosteo.containsKey(palabra)) {
                                 /*vocabulario = new Vocabulario();
                                 vocabulario = hashVocabulario.get(palabra);*/
-                                indexarPosteo(documento, idDoc, palabra, hashVocabulario.get(palabra).getTf());
+                                indexarPosteo(documento, idDoc, palabra, 1);
                                 //Aumentamos en 1 el nr de vocabulario
                                 vocabulario = hashVocabulario.get(palabra);
                                 vocabulario.setNr(vocabulario.getNr() + 1);
