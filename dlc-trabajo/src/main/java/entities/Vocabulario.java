@@ -17,7 +17,7 @@ public class Vocabulario {
     }
 
     public Vocabulario() {
-        this("", 1, 1, 1);
+        this("", 0, 1, 1);
     }
 
     public String getPalabra() {

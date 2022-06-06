@@ -21,7 +21,7 @@ public class Buscador {
     }
 
     public void buscar(){
-        String palabraABuscar = "QUIXOTE";
+        String palabraABuscar = "QUIJOTE";
         hashPosteoBuscar = DAOposteo.buscarPalabra(palabraABuscar);
     }
 
