@@ -43,9 +43,7 @@ public class Indexer {
 
             indexar(documento, i);
             i++;
-            if(i >= 2){
-                break;
-            }
+
 
 
 
