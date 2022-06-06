@@ -4,9 +4,9 @@ public class Documento {
     //Existen 593 documentos en el archivo que nos pasaron
     private Integer id;
     private String nombreDocumento;
-    private Integer valor;
+    private float valor;
 
-    public Documento(Integer id, String nombreDocumento, Integer valor) {
+    public Documento(Integer id, String nombreDocumento, float valor) {
         this.id = id;
         this.nombreDocumento = nombreDocumento;
         this.valor = valor;
@@ -32,7 +32,7 @@ public class Documento {
         this.nombreDocumento = nombreDocumento;
     }
 
-    public Integer getValor() {
+    public float getValor() {
         return valor;
     }
 

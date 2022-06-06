@@ -4,10 +4,7 @@ import entities.Documento;
 import entities.Posteo;
 import entities.Vocabulario;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,5 +33,26 @@ public class DAOposteo {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static HashMap<Integer, Posteo>  buscarPalabra(String palabraABuscar){
+        HashMap<Integer, Posteo> hashPosteo = new HashMap<>();
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT id, palabra, idDocumento, tf FROM Buscador.Posteo WHERE palabra = ?");
+            ps.setString(1, palabraABuscar);
+            ResultSet rs = ps.executeQuery();
+
+
+            while(rs.next()){
+                //int idDocumento, int tf, String palabra
+                Posteo posteo = new Posteo(rs.getInt(3),rs.getInt(4),rs.getString(2));
+                hashPosteo.put(posteo.getIdDocumento(), posteo);
+            }
+        }
+        catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+        return hashPosteo;
+
     }
 }

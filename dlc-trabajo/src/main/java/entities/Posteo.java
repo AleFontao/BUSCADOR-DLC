@@ -2,6 +2,8 @@ package entities;
 
 import javax.print.Doc;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Posteo {
     private int idDocumento;
@@ -43,5 +45,14 @@ public class Posteo {
         return tf;
     }
 
+    public float calcularImportancia(Integer cantidadDocs, Integer nr){
+        /*float divisor = 0;
+        for (Map.Entry<String, Posteo> entry : posteoPalabraBuscada.entrySet()) {
+            divisor = (float) Math.pow ((float) entry.getValue().getTf() * Math.log10(cantidadDocs/posteoPalabraBuscada.size()),  2);
+        }*/
+        float importancia = (float) ((float)this.tf * Math.log10(cantidadDocs/nr));
+
+        return importancia;
+    }
 
 }

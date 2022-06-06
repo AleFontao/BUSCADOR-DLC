@@ -1,5 +1,6 @@
 package services;
 
+import DAO.DAOdocumento;
 import DAO.DAOposteo;
 import entities.Documento;
 import entities.Posteo;
@@ -42,18 +43,18 @@ public class Indexer {
         for (File documento : listaDocumentos) {
 
             indexar(documento, i);
+            //Metemos el doc a la bd
+            Documento docParaBD = new Documento();
+            docParaBD.setNombreDocumento(documento.getName());
+            DAOdocumento.insertarDocumento(docParaBD);
             i++;
-            if(i >= 2){
-                break;
-            }
-
-
 
         }
         long endTime = System.currentTimeMillis() - startTime;
         System.out.println(endTime);
 
         DAOvocabulario.insertarVocabulario(hashVocabulario);
+
 
     }
 
@@ -89,69 +90,28 @@ public class Indexer {
                     if (match.find()) {
                         palabra = match.replaceAll("");
                     }
-                    //Se saca las palabras de un caracter y los espacios
 
                     if (palabra.length() > 1 && !palabra.equals(" ")) {
                         if (palabra.length() > 25) {
                             this.palabras++;
                             continue;
                         }
-                        Vocabulario vocabulario;
-                        Posteo posteo;
                         //Si no existe la palabra la agregamos
                         if (!hashVocabulario.containsKey(palabra)) {
-                            vocabulario = new Vocabulario();
-                            vocabulario.setPalabra(palabra);
-                            //Usamos de key la palabra para volver obtener el vocabulario.
-                            hashVocabulario.put(palabra, vocabulario);
-
-                            this.palabras++;
+                           meterPalabraPorPrimeraVezVoc(palabra);
+                           crearPosteo(documento, idDoc, palabra, hashVocabulario.get(palabra).getTf());
                         } else {
                             if (!hashPosteo.containsKey(palabra)) {
-                                /*vocabulario = new Vocabulario();
-                                vocabulario = hashVocabulario.get(palabra);*/
-                                indexarPosteo(documento, idDoc, palabra, hashVocabulario.get(palabra).getTf());
-                                //Aumentamos en 1 el nr de vocabulario
-                                vocabulario = hashVocabulario.get(palabra);
-                                vocabulario.setNr(vocabulario.getNr() + 1);
-                                hashVocabulario.put(palabra, vocabulario);
-
+                                crearPosteo(documento, idDoc, palabra, hashVocabulario.get(palabra).getTf());
                             }
                             else{
-                                posteo = hashPosteo.get(palabra);
-                                posteo.setTf(hashPosteo.get(palabra).getTf() + 1);
+                               aumentarPosteo(palabra);
                             }
-                            //Palabras que aparecen mas de una vez
-                            vocabulario = hashVocabulario.get(palabra);
-                            vocabulario.setTf(vocabulario.getTf() + 1);
-                            posteo = hashPosteo.get(palabra);
-
-                            hashPosteo.put(palabra, posteo);
-                            if (hashPosteo.get(palabra) != null) {
-
-                                if (vocabulario.getMaxTf() < hashPosteo.get(palabra).getTf()) {
-                                    vocabulario.setMaxTf(hashPosteo.get(palabra).getTf());
-                                }
-                            }
-
-                            hashVocabulario.put(palabra, vocabulario);
+                            aumentarVocabulario(palabra);
                         }
-
-                        if (!hashPosteo.containsKey(palabra)) {
-                               /* vocabulario = new Vocabulario();
-                                vocabulario = hashVocabulario.get(palabra);*/
-                            indexarPosteo(documento, idDoc, palabra, hashVocabulario.get(palabra).getTf());
-                            //Aumentamos en 1 el nr de vocabulario
-                            vocabulario = hashVocabulario.get(palabra);
-                            vocabulario.setNr(vocabulario.getNr() + 1);
-                            hashVocabulario.put(palabra, vocabulario);
-
-                        }
-
                     }
                 }
                 linea = info.readLine();
-
             }
             System.out.println("-------------------");
             DAOposteo.insertarPosteo(hashPosteo);
@@ -162,11 +122,48 @@ public class Indexer {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-
     }
 
-    public void indexarPosteo(File documento, Integer idDoc, String palabra, Integer tf) {
+    public void aumentarNr(String palabra){
+        Vocabulario vocabulario = hashVocabulario.get(palabra);
+        vocabulario.setNr(vocabulario.getNr() + 1);
+        hashVocabulario.put(palabra, vocabulario);
+    }
+
+    public void meterPalabraPorPrimeraVezVoc(String palabra){
+        Vocabulario vocabulario = new Vocabulario();
+        vocabulario.setPalabra(palabra);
+        //Usamos de key la palabra para volver a obtener el vocabulario.
+        hashVocabulario.put(palabra, vocabulario);
+        this.palabras++;
+    }
+
+    public void aumentarVocabulario(String palabra){
+        Vocabulario vocabulario = hashVocabulario.get(palabra);
+        vocabulario.setTf(vocabulario.getTf() + 1);
+        aumentarMaxTf(palabra, vocabulario); //Aumentamos el maxTf
+        //Falta meter el posteo de vuelta
+        hashVocabulario.put(palabra, vocabulario);
+    }
+
+    public void aumentarMaxTf(String palabra, Vocabulario vocabulario){
+        Posteo posteo = hashPosteo.get(palabra);
+        if (posteo != null) {
+            if (vocabulario.getMaxTf() < posteo.getTf()) {
+                vocabulario.setMaxTf(posteo.getTf());
+            }
+        }
+        hashPosteo.put(palabra, posteo);
+    }
+
+    public void aumentarPosteo(String palabra){
+        Posteo posteo = hashPosteo.get(palabra);
+        posteo.setTf(posteo.getTf() + 1);
+    }
+
+
+    public void crearPosteo(File documento, Integer idDoc, String palabra, Integer tf) {
+
         Documento doc = new Documento();
         doc.setNombreDocumento(documento.getName());
         Posteo posteo = new Posteo();
@@ -174,6 +171,7 @@ public class Indexer {
         posteo.setPalabra(palabra);
         posteo.setTf(tf);
         hashPosteo.put(palabra, posteo);
+        aumentarNr(palabra);
 
         return;
     }

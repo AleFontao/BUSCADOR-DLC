@@ -17,7 +17,7 @@ public class Vocabulario {
     }
 
     public Vocabulario() {
-        this("", 0, 1, 1);
+        this("", 1, 1, 1);
     }
 
     public String getPalabra() {
@@ -48,14 +48,6 @@ public class Vocabulario {
 
     public void setMaxTf(Integer maxTf) {this.maxTf = maxTf;}
 
-    public float calcularImportancia(Integer cantidadDocs, HashMap<String, Posteo> posteoPalabraBuscada){
-        float divisor = 0;
-        for (Map.Entry<String, Posteo> entry : posteoPalabraBuscada.entrySet()) {
-            divisor = (float) Math.pow ((float) entry.getValue().getTf() * Math.log10(cantidadDocs/posteoPalabraBuscada.size()),  2);
-        }
-        float importancia = (float) ((float)this.tf * Math.log10(cantidadDocs/this.nr)/(Math.sqrt(divisor)));
 
-        return importancia;
-    }
 
 }

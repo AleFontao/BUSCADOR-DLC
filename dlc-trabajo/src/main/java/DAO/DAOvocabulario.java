@@ -22,6 +22,7 @@ public class DAOvocabulario {
 
             Enumeration<Vocabulario> vocHash = vocabulario.elements();
             while(vocHash.hasMoreElements()){
+
                 Vocabulario palabra = vocHash.nextElement();
                 ps.setString(1, palabra.getPalabra());
                 ps.setInt(2,palabra.getTf());
