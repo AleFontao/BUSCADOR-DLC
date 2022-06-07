@@ -24,7 +24,13 @@ public class Indexer {
 
     public static void main(String args[]) {
         Indexer indexer = new Indexer();
+        ////
+        String url = "C:\\Users\\alefo\\Downloads\\DocumentosTP1Agregar\\alejo.txt";
+        File archivo = new File(url);
+        System.out.println(archivo.getTotalSpace());
+
         indexer.leerArchivos();
+        indexer.agregarArchivo(archivo);
     }
 
     public Indexer() {
@@ -73,12 +79,19 @@ public class Indexer {
     //Habria que ver como hacer para agregar e indexar muchos archivos
     public void agregarArchivo(File documento){
         ArrayList<Documento> arrayDocumentos = buscarDocumentos();
+        Boolean bandera = false;
         for(Documento doc: arrayDocumentos){
-            if(!doc.getNombreDocumento().equals(documento)){
-                indexar(documento, arrayDocumentos.size() + 1, this.hashVocabularioAgregarArchivo);
-                compararVocabularios();
-                new File(documento, "src/main/resources/DocumentosTP1");
+            if(!doc.getNombreDocumento().equals(documento.getName())){
+                bandera = true;
             }
+        }
+        if(bandera){
+            indexar(documento, arrayDocumentos.size() + 1, this.hashVocabularioAgregarArchivo);
+            Documento documentoAgregar = new Documento();
+            documentoAgregar.setNombreDocumento(documento.getName());
+            DAOdocumento.insertarDocumento(documentoAgregar);
+            compararVocabularios();
+            //new File(documento, "src/main/resources/DocumentosTP1");
         }
     }
 
@@ -104,7 +117,7 @@ public class Indexer {
                 this.hashVocabularioIndexar.put(palabra, vocabularioUpdate);
 
                 //añadimos el vocabularioUpdate al array apra luego mandarlo a la base de datos
-                arrayVocabularioUpdate.add(this.hashVocabularioIndexar.get(vocabulario));
+                arrayVocabularioUpdate.add(this.hashVocabularioIndexar.get(palabra));
 
                 //borramos de la hash ese vocabulario para luego con la hash que quede insertarla a la BD,
                 //ya que ahi estaran los vocabularios nuevos que noe staban en la hash original
@@ -150,12 +163,14 @@ public class Indexer {
                             if (!hashVocabulario.containsKey(palabra)) {
                                 meterPalabraPorPrimeraVezVoc(palabra, hashVocabulario);
                                 crearPosteo(documento, idDoc, palabra);
+                                aumentarNr(palabra, hashVocabulario);
                             } else {
                                 if (!hashPosteo.containsKey(palabra)) {
                                     crearPosteo(documento, idDoc, palabra);
+                                    aumentarNr(palabra, hashVocabulario);
                                 } else {
                                     aumentarPosteo(palabra);
-                                    aumentarNr(palabra, hashVocabulario);
+
                                 }
                                 aumentarVocabulario(palabra, hashVocabulario);
                             }

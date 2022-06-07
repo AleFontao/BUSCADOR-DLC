@@ -40,7 +40,7 @@ public class DAOvocabulario {
             }
             ps.executeBatch();
             long endTime = System.currentTimeMillis() - startTime;
-            System.out.println(endTime);
+            System.out.println("Total tiempo: " + endTime);
 
 
         } catch (SQLException e) {

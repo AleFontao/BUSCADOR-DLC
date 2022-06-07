@@ -1,0 +1,2 @@
+Cuando añadimos un nuevo archivo el documento no lo estoy agregando ala base de datos por lo cual deberiamos agregarlo
+al ultimo tomar ese indice y agregarselo al posteo que estamos agregando. (quilombo)

@@ -47,7 +47,7 @@ public class DAOdocumento {
             PreparedStatement ps = con.prepareStatement("SELECT idDocumento, nombreDocumento FROM Buscador.Documento ORDER BY idDocumento ASC");
 
             ResultSet rs = ps.executeQuery();
-            if(rs.next()) {
+            while(rs.next()) {
                 Documento documento = new Documento();
                 documento.setId(rs.getInt(1));
                 documento.setNombreDocumento(rs.getString(2));
