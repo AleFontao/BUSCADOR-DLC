@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -46,6 +47,27 @@ public class DAOvocabulario {
             throw new RuntimeException(e);
         }
 
+
+    }
+
+    public static void modificarVocabulario(ArrayList<Vocabulario> arrayVocabularioModificar){
+        try {
+
+            PreparedStatement ps = con.prepareStatement("UPDATE Vocabulario SET tf = ?, maxTf = ?, nr = ? WHERE palabra = ?");
+
+            for(Vocabulario voc: arrayVocabularioModificar){
+                ps.setString(4, voc.getPalabra());
+                ps.setInt(1,voc.getTf());
+                ps.setInt(2,voc.getMaxTf());
+                ps.setInt(3,voc.getNr());
+                ps.addBatch();
+
+            }
+            ps.executeBatch();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 }

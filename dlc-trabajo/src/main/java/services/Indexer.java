@@ -18,7 +18,8 @@ import javax.print.Doc;
 public class Indexer {
     Integer palabras = 0;
     private StringTokenizer tokens;
-    private Hashtable<String, Vocabulario> hashVocabulario; //Uso una hash table como estructura para ir almacenando las palabras del vocabulario
+    private Hashtable<String, Vocabulario> hashVocabularioIndexar; //Uso una hash table como estructura para ir almacenando las palabras del vocabulario
+    private Hashtable<String, Vocabulario> hashVocabularioAgregarArchivo;
     private HashMap<String, Posteo> hashPosteo;
 
     public static void main(String args[]) {
@@ -27,7 +28,8 @@ public class Indexer {
     }
 
     public Indexer() {
-        this.hashVocabulario = new Hashtable<>();
+        this.hashVocabularioIndexar = new Hashtable<>();
+        this.hashVocabularioAgregarArchivo = new Hashtable<>();
         this.hashPosteo = new HashMap<>();
     }
 
@@ -41,21 +43,17 @@ public class Indexer {
         long startTime = System.currentTimeMillis();
         for (File documento : listaDocumentos) {
 
-            indexar(documento, contadorDocumentos);
+            indexar(documento, contadorDocumentos, this.hashVocabularioIndexar);
             //Metemos el doc a la bd
             Documento docParaBD = new Documento();
             docParaBD.setNombreDocumento(documento.getName());
             DAOdocumento.insertarDocumento(docParaBD);
             contadorDocumentos++;
-
-
         }
         long endTime = System.currentTimeMillis() - startTime;
         System.out.println(endTime);
 
-        DAOvocabulario.insertarVocabulario(this.hashVocabulario);
-
-
+        DAOvocabulario.insertarVocabulario(this.hashVocabularioIndexar);
     }
 
     public void listarArchivosEnCarpeta(File carpeta, ArrayList<File> listaDocumentos) {
@@ -77,13 +75,51 @@ public class Indexer {
         ArrayList<Documento> arrayDocumentos = buscarDocumentos();
         for(Documento doc: arrayDocumentos){
             if(!doc.getNombreDocumento().equals(documento)){
-                indexar(documento, arrayDocumentos.size() + 1);
+                indexar(documento, arrayDocumentos.size() + 1, this.hashVocabularioAgregarArchivo);
+                compararVocabularios();
                 new File(documento, "src/main/resources/DocumentosTP1");
             }
         }
     }
 
-    public void indexar(File documento, Integer idDoc) {
+    //A chequear
+    public void compararVocabularios(){
+        Enumeration<Vocabulario> vocHash = this.hashVocabularioAgregarArchivo.elements();
+        ArrayList<Vocabulario> arrayVocabularioUpdate = new ArrayList<>();
+
+        while(vocHash.hasMoreElements()){
+            Vocabulario vocabulario = vocHash.nextElement();
+            String palabra = vocabulario.getPalabra();
+            if(this.hashVocabularioIndexar.containsKey(palabra)){
+                Vocabulario vocabularioUpdate = this.hashVocabularioIndexar.get(palabra);
+
+                //updatemamos los atributos nr, tf, y maxTf
+                vocabularioUpdate.setTf(vocabulario.getTf() + vocabularioUpdate.getTf());
+                if(vocabulario.getMaxTf() > vocabularioUpdate.getMaxTf()){
+                    vocabularioUpdate.setMaxTf(vocabulario.getMaxTf());
+                }
+                vocabularioUpdate.setNr(vocabulario.getNr() + vocabularioUpdate.getNr());
+
+                //actualizamos la hash que persiste para que contenga el vocabulario actualizado
+                this.hashVocabularioIndexar.put(palabra, vocabularioUpdate);
+
+                //añadimos el vocabularioUpdate al array apra luego mandarlo a la base de datos
+                arrayVocabularioUpdate.add(this.hashVocabularioIndexar.get(vocabulario));
+
+                //borramos de la hash ese vocabulario para luego con la hash que quede insertarla a la BD,
+                //ya que ahi estaran los vocabularios nuevos que noe staban en la hash original
+                this.hashVocabularioAgregarArchivo.remove(palabra);
+
+            }
+
+        }
+        DAOvocabulario.insertarVocabulario(this.hashVocabularioAgregarArchivo);
+        DAOvocabulario.modificarVocabulario(arrayVocabularioUpdate);
+
+
+    }
+
+    public void indexar(File documento, Integer idDoc, Hashtable<String, Vocabulario> hashVocabulario) {
 
         //Separar logica del chorizo(que funciona) este
         try (BufferedReader info = new BufferedReader(new InputStreamReader(new FileInputStream(new File(documento.getPath())), "ISO-8859-1"))) {
@@ -105,24 +141,23 @@ public class Indexer {
                     }
 
                     for(String palabra: palabras) {
-
-
                         if (palabra.length() > 1 && !palabra.equals(" ")) {
                             if (palabra.length() > 25) {
                                 this.palabras++;
                                 continue;
                             }
                             //Si no existe la palabra la agregamos
-                            if (!this.hashVocabulario.containsKey(palabra)) {
-                                meterPalabraPorPrimeraVezVoc(palabra);
+                            if (!hashVocabulario.containsKey(palabra)) {
+                                meterPalabraPorPrimeraVezVoc(palabra, hashVocabulario);
                                 crearPosteo(documento, idDoc, palabra);
                             } else {
                                 if (!hashPosteo.containsKey(palabra)) {
                                     crearPosteo(documento, idDoc, palabra);
                                 } else {
                                     aumentarPosteo(palabra);
+                                    aumentarNr(palabra, hashVocabulario);
                                 }
-                                aumentarVocabulario(palabra);
+                                aumentarVocabulario(palabra, hashVocabulario);
                             }
                         }
                     }
@@ -141,26 +176,26 @@ public class Indexer {
     }
 
 
-    public void aumentarNr(String palabra){
-        Vocabulario vocabulario = this.hashVocabulario.get(palabra);
+    public void aumentarNr(String palabra, Hashtable<String, Vocabulario> hashVocabulario){
+        Vocabulario vocabulario = hashVocabulario.get(palabra);
         vocabulario.setNr(vocabulario.getNr() + 1);
-        this.hashVocabulario.put(palabra, vocabulario);
+        hashVocabulario.put(palabra, vocabulario);
     }
 
-    public void meterPalabraPorPrimeraVezVoc(String palabra){
+    public void meterPalabraPorPrimeraVezVoc(String palabra, Hashtable<String, Vocabulario> hashVocabulario){
         Vocabulario vocabulario = new Vocabulario();
         vocabulario.setPalabra(palabra);
         //Usamos de key la palabra para volver a obtener el vocabulario.
-        this.hashVocabulario.put(palabra, vocabulario);
+        hashVocabulario.put(palabra, vocabulario);
         this.palabras++;
     }
 
-    public void aumentarVocabulario(String palabra){
-        Vocabulario vocabulario = this.hashVocabulario.get(palabra);
+    public void aumentarVocabulario(String palabra, Hashtable<String, Vocabulario> hashVocabulario){
+        Vocabulario vocabulario = hashVocabulario.get(palabra);
         vocabulario.setTf(vocabulario.getTf() + 1);
         aumentarMaxTf(palabra, vocabulario); //Aumentamos el maxTf
         //Falta meter el posteo de vuelta
-        this.hashVocabulario.put(palabra, vocabulario);
+        hashVocabulario.put(palabra, vocabulario);
     }
 
     public void aumentarMaxTf(String palabra, Vocabulario vocabulario){
@@ -187,7 +222,6 @@ public class Indexer {
         posteo.setPalabra(palabra);
         posteo.setTf(1);
         this.hashPosteo.put(palabra, posteo);
-        aumentarNr(palabra);
         return;
     }
     
