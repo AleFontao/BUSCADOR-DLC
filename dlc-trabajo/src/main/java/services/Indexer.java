@@ -24,11 +24,11 @@ public class Indexer {
 
     public static void main(String args[]) {
         Indexer indexer = new Indexer();
-        ////
+        ////Para probar
         String url = "C:\\Users\\alefo\\Downloads\\DocumentosTP1Agregar\\alejo.txt";
         File archivo = new File(url);
         System.out.println(archivo.getTotalSpace());
-
+        ////
         indexer.leerArchivos();
         indexer.agregarArchivo(archivo);
     }

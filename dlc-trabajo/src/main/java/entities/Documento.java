@@ -36,7 +36,7 @@ public class Documento {
         return valor;
     }
 
-    public void setValor(Integer valor) {
+    public void setValor(float valor) {
         this.valor = valor;
     }
 }
