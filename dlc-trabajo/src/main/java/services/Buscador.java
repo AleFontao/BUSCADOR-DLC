@@ -21,7 +21,10 @@ public class Buscador {
     }
 
     public void buscar(){
-        String palabraABuscar = "QUIJOTE";
+        Scanner sc=new Scanner(System.in);
+        System.out.println("Ingrese la palabra a buscar: ");
+        String palabraABuscar = sc.next();
+        palabraABuscar.toUpperCase();
         hashPosteoBuscar = DAOposteo.buscarPalabra(palabraABuscar);
     }
 

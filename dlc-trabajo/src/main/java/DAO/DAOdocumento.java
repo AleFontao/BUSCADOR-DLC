@@ -4,7 +4,9 @@ import entities.Documento;
 import entities.Posteo;
 import entities.Vocabulario;
 
+import javax.print.Doc;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Enumeration;
 
 public class DAOdocumento {
@@ -37,5 +39,24 @@ public class DAOdocumento {
             throw new RuntimeException(e);
         }
         return nombreDocumento;
+    }
+
+    public static ArrayList<Documento> obtenerTodosLosDocumentos(){
+        ArrayList<Documento> arrayDocumentos = new ArrayList<>();
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT idDocumento, nombreDocumento FROM Buscador.Documento ORDER BY idDocumento ASC");
+
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()) {
+                Documento documento = new Documento();
+                documento.setId(rs.getInt(1));
+                documento.setNombreDocumento(rs.getString(2));
+                arrayDocumentos.add(documento);
+            }
+        }
+        catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+        return arrayDocumentos;
     }
 }

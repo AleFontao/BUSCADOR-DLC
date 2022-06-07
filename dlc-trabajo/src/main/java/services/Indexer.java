@@ -7,14 +7,13 @@ import entities.Posteo;
 import entities.Vocabulario;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import DAO.DAOvocabulario;
+
+import javax.print.Doc;
 
 public class Indexer {
     Integer palabras = 0;
@@ -38,17 +37,16 @@ public class Indexer {
         ArrayList<File> listaDocumentos = new ArrayList<>();
 
         listarArchivosEnCarpeta(direccionArchivo, listaDocumentos);
-        int i = 1;
+        int contadorDocumentos = 1;
         long startTime = System.currentTimeMillis();
         for (File documento : listaDocumentos) {
 
-            indexar(documento, i);
+            indexar(documento, contadorDocumentos);
             //Metemos el doc a la bd
             Documento docParaBD = new Documento();
             docParaBD.setNombreDocumento(documento.getName());
             DAOdocumento.insertarDocumento(docParaBD);
-            System.out.println(documento.getName());
-            i++;
+            contadorDocumentos++;
 
 
         }
@@ -74,8 +72,18 @@ public class Indexer {
         System.out.println("Cantidad Archivos: " + listaDocumentos.size());
     }
 
+    //Habria que ver como hacer para agregar e indexar muchos archivos
+    public void agregarArchivo(File documento){
+        ArrayList<Documento> arrayDocumentos = buscarDocumentos();
+        for(Documento doc: arrayDocumentos){
+            if(!doc.getNombreDocumento().equals(documento)){
+                indexar(documento, arrayDocumentos.size() + 1);
+                new File(documento, "src/main/resources/DocumentosTP1");
+            }
+        }
+    }
+
     public void indexar(File documento, Integer idDoc) {
-        Boolean bandera = true;
 
         //Separar logica del chorizo(que funciona) este
         try (BufferedReader info = new BufferedReader(new InputStreamReader(new FileInputStream(new File(documento.getPath())), "ISO-8859-1"))) {
@@ -97,10 +105,7 @@ public class Indexer {
                     }
 
                     for(String palabra: palabras) {
-                        if (palabra.equals("QUIJOTE") && bandera && (documento.getName().equals("2donq10.txt") || documento.getName().equals("a1001108.txt") || documento.getName().equals("mdmar10.txt"))) {
-                            System.out.println(documento.getName());
-                            bandera = false;
-                        }
+
 
                         if (palabra.length() > 1 && !palabra.equals(" ")) {
                             if (palabra.length() > 25) {
@@ -184,5 +189,10 @@ public class Indexer {
         this.hashPosteo.put(palabra, posteo);
         aumentarNr(palabra);
         return;
+    }
+    
+    public  ArrayList<Documento> buscarDocumentos(){
+        ArrayList<Documento> arrayDocumentos = DAOdocumento.obtenerTodosLosDocumentos();
+        return arrayDocumentos;
     }
 }
